@@ -6,9 +6,10 @@ const Button = ({ onClick, text }) => {
 
 const StatisticLine = ({ text, count }) => {
 	return (
-		<p>
-			{text} {count}
-		</p>
+		<tr>
+			<td>{text}</td>
+			<td>{count}</td>
+		</tr>
 	);
 };
 //done already in previous step
@@ -20,15 +21,21 @@ const Statistics = ({ good, neutral, bad }) => {
 		return <p>No feedback given</p>;
 	}
 	return (
-		<>
-			<h1>Statistics</h1>
-			<StatisticLine text={'good'} count={good} />
-			<StatisticLine text={'neutral'} count={neutral} />
-			<StatisticLine text={'bad'} count={bad} />
-			<StatisticLine text={'all'} count={all} />
-			<StatisticLine text={'average'} count={avg} />
-			<StatisticLine text={'positive'} count={pos} />
-		</>
+		<table>
+			<tbody>
+				<tr>
+					<th>
+						<h1>Statistics</h1>
+					</th>
+				</tr>
+				<StatisticLine text={'good'} count={good} />
+				<StatisticLine text={'neutral'} count={neutral} />
+				<StatisticLine text={'bad'} count={bad} />
+				<StatisticLine text={'all'} count={all} />
+				<StatisticLine text={'average'} count={avg} />
+				<StatisticLine text={'positive'} count={pos} />
+			</tbody>
+		</table>
 	);
 };
 
