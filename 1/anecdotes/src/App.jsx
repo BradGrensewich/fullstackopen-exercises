@@ -1,5 +1,13 @@
 import { useState } from 'react';
 
+const Anecdote = ({ text, votes }) => {
+	return (
+		<div>
+			{text} has {votes} votes
+		</div>
+	);
+};
+
 const App = () => {
 	const anecdotes = [
 		'If it hurts, do it more often.',
@@ -16,22 +24,35 @@ const App = () => {
 	const [selected, setSelected] = useState(0);
 	const [votes, setVotes] = useState(Array(count).fill(0));
 
-	const addVote = () => {
-		const newVotes = [...votes];
-		newVotes[selected] += 1;
-		setVotes(newVotes);
-	};
 	const setNewNumber = () => {
 		const rand = Math.floor(Math.random() * count);
 		setSelected(rand);
 	};
 
+	const addVote = () => {
+		const newVotes = [...votes];
+		newVotes[selected] += 1;
+		setVotes(newVotes);
+	};
+
+	let most = 0;
+	let index = 0;
+	votes.forEach((tally, i) => {
+		if (tally > most) {
+			index = i;
+			most = tally;
+		}
+	});
+	const winner = index;
+
 	return (
 		<>
-			<div>{anecdotes[selected]}</div>
-			<div>has {votes[selected]} votes</div>
+			<h1>Anecdote of the Day</h1>
+			<Anecdote text={anecdotes[selected]} votes={votes[selected]} />
 			<button onClick={addVote}>vote</button>
 			<button onClick={setNewNumber}>next anecdote</button>
+			<h1>Anecdote with the most votes</h1>
+			<Anecdote text={anecdotes[winner]} votes={votes[winner]} />
 		</>
 	);
 };
