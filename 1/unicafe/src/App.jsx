@@ -3,7 +3,7 @@ import { useState } from 'react';
 const Button = ({ onClick, text }) => {
 	return <button onClick={onClick}>{text}</button>;
 };
-
+//done already in previous step
 const Statistics = ({ good, neutral, bad }) => {
   const all = good + neutral + bad
   const avg = (good - bad) / all
