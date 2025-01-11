@@ -1,5 +1,35 @@
 import { useState } from 'react';
 
+const Filter = ({ onChange, searchFilter }) => {
+	return (
+		<div>
+			filter shown with <input onChange={onChange} value={searchFilter} />
+		</div>
+	);
+};
+
+const NewPersonForm = ({
+	onSubmit,
+	name,
+	number,
+	onNameChange,
+	onNumberChange,
+}) => {
+	return (
+		<form onSubmit={onSubmit}>
+			<div>
+				name: <input onChange={onNameChange} value={name} />
+			</div>
+			<div>
+				number: <input onChange={onNumberChange} value={number} />
+			</div>
+			<div>
+				<button type='submit'>add</button>
+			</div>
+		</form>
+	);
+};
+
 const PersonItem = ({ person }) => {
 	return (
 		<li>
@@ -50,36 +80,28 @@ const App = () => {
 		setNewNumber('');
 	};
 
-	const updateNewName = (event) => {
+	const handleNameChange = (event) => {
 		setNewName(event.target.value);
 	};
-	const updateNewNumber = (event) => {
+	const handleNumberChange = (event) => {
 		setNewNumber(event.target.value);
 	};
-	const updateSearchFilter = (event) => {
+	const handleSearchChange = (event) => {
 		setSearchFilter(event.target.value);
 	};
 
 	return (
 		<div>
 			<h2>Phonebook</h2>
-			<div>
-				filter shown with{' '}
-				<input onChange={updateSearchFilter} value={searchFilter} />
-			</div>
+			<Filter onChange={handleSearchChange} searchFilter={searchFilter} />
 			<h2>Numbers</h2>
-			<form onSubmit={addPerson}>
-				<div>
-					name: <input onChange={updateNewName} value={newName} />
-				</div>
-				<div>
-					number:{' '}
-					<input onChange={updateNewNumber} value={newNumber} />
-				</div>
-				<div>
-					<button type='submit'>add</button>
-				</div>
-			</form>
+			<NewPersonForm
+				onSubmit={addPerson}
+				name={newName}
+				number={newNumber}
+				onNameChange={handleNameChange}
+				onNumberChange={handleNumberChange}
+			/>
 			<h2>Numbers</h2>
 			<PersonList persons={persons} searchFilter={searchFilter} />
 		</div>
