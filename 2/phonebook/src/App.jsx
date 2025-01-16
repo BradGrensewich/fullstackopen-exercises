@@ -31,15 +31,16 @@ const NewPersonForm = ({
 	);
 };
 
-const PersonItem = ({ person }) => {
+const PersonItem = ({ person, onDelete }) => {
 	return (
 		<li>
 			{person.name} {person.number}
+			<button onClick={onDelete}>delete</button>
 		</li>
 	);
 };
 
-const PersonList = ({ persons, searchFilter }) => {
+const PersonList = ({ persons, searchFilter, onDelete }) => {
 	const caseLessFilter = searchFilter.toLowerCase();
 	const filteredPersons = persons.filter((person) =>
 		person.name.toLowerCase().includes(caseLessFilter)
@@ -47,7 +48,11 @@ const PersonList = ({ persons, searchFilter }) => {
 	return (
 		<ul>
 			{filteredPersons.map((person) => (
-				<PersonItem key={person.id} person={person} />
+				<PersonItem
+					key={person.id}
+					person={person}
+					onDelete={() => onDelete(person.id)}
+				/>
 			))}
 		</ul>
 	);
@@ -95,6 +100,18 @@ const App = () => {
 		setNewNumber('');
 	};
 
+	const handleDeletePerson = (id) => {
+		personServices
+			.remove(id)
+			.then((returnedPerson) => {
+				setPersons(persons.filter((person) => person.id !== id));
+				console.log(`${returnedPerson.name} was deleted`);
+			})
+			.catch((error) => {
+				console.log(`Could not delete ${id}`);
+			});
+	};
+
 	const handleNameChange = (event) => {
 		setNewName(event.target.value);
 	};
@@ -118,7 +135,11 @@ const App = () => {
 				onNumberChange={handleNumberChange}
 			/>
 			<h2>Numbers</h2>
-			<PersonList persons={persons} searchFilter={searchFilter} />
+			<PersonList
+				persons={persons}
+				searchFilter={searchFilter}
+				onDelete={handleDeletePerson}
+			/>
 		</div>
 	);
 };
