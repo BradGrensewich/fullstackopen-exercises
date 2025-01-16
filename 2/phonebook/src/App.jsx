@@ -77,8 +77,9 @@ const App = () => {
 
 	const addPerson = (event) => {
 		event.preventDefault();
-		if (persons.find((p) => p.name === newName)) {
-			alert(`${newName} is already added to phonebook`);
+		const person = persons.find((p) => p.name === newName);
+		if (person) {
+			updatePerson(person);
 			return;
 		}
 		personServices
@@ -89,22 +90,41 @@ const App = () => {
 			.catch((error) => {
 				console.log('adding to server failed', error);
 			});
-		setPersons(
-			persons.concat({
-				name: newName,
-				number: newNumber,
-				id: persons.length + 1,
-			})
-		);
+
 		setNewName('');
 		setNewNumber('');
 	};
 
+	const updatePerson = (person) => {
+		if (
+			!confirm(
+				`${person.name} is already in phonebook. Replace old number?`
+			)
+		) {
+			return;
+		}
+		personServices
+			.update(person.id, { ...person, number: newNumber })
+			.then((returnedPerson) => {
+				setPersons(
+					persons.map((p) =>
+						p.id === returnedPerson.id ? returnedPerson : p
+					)
+				);
+			});
+	};
+
 	const handleDeletePerson = (id) => {
+		const toDelete = persons.find((person) => person.id === id);
+		if (!confirm(`Delete ${toDelete.name}?`)) {
+			return;
+		}
 		personServices
 			.remove(id)
 			.then((returnedPerson) => {
-				setPersons(persons.filter((person) => person.id !== id));
+				setPersons(
+					persons.filter((person) => person.id !== returnedPerson.id)
+				);
 				console.log(`${returnedPerson.name} was deleted`);
 			})
 			.catch((error) => {
