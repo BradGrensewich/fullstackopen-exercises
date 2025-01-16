@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import personServices from './services/persons';
 
 const Filter = ({ onChange, searchFilter }) => {
 	return (
@@ -60,9 +60,14 @@ const App = () => {
 	const [searchFilter, setSearchFilter] = useState('');
 
 	useEffect(() => {
-		axios.get('http://localhost:3001/persons').then((response) => {
-			setPersons(response.data);
-		});
+		personServices
+			.getAll()
+			.then((initialList) => {
+				setPersons(initialList);
+			})
+			.catch((error) => {
+				console.log('initial fetch failed', error);
+			});
 	}, []);
 
 	const addPerson = (event) => {
@@ -71,6 +76,14 @@ const App = () => {
 			alert(`${newName} is already added to phonebook`);
 			return;
 		}
+		personServices
+			.create({ name: newName, number: newNumber })
+			.then((returnedPerson) => {
+				setPersons(persons.concat(returnedPerson));
+			})
+			.catch((error) => {
+				console.log('adding to server failed', error);
+			});
 		setPersons(
 			persons.concat({
 				name: newName,
