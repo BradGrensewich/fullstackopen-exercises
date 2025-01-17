@@ -3,14 +3,8 @@ import personServices from './services/persons';
 import Notification from './components/Notification';
 import NewPersonForm from './components/NewPersonForm';
 import PersonList from './components/PersonList';
+import Filter from './components/Filter';
 
-const Filter = ({ onChange, searchFilter }) => {
-	return (
-		<div>
-			filter shown with <input onChange={onChange} value={searchFilter} />
-		</div>
-	);
-};
 
 const App = () => {
 	const [persons, setPersons] = useState([]);
