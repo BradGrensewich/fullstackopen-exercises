@@ -3,7 +3,7 @@ import countryServices from '../services/countries';
 import CountryList from './CountryList'
 import CountryData from './CountryData'
 
-const Display = ({ filter }) => {
+const Display = ({ filter, onCountrySelected }) => {
 	const [countries, setCountries] = useState([]);
 
 	const filteredCountries = countries.filter((country) =>
@@ -20,7 +20,7 @@ const Display = ({ filter }) => {
         return (<CountryData country={filteredCountries[0]}/>)
 
     } else if (filteredCountries.length <= 10) {
-        return (<CountryList countries={filteredCountries}/>)
+        return (<CountryList countries={filteredCountries} onCountrySelected={onCountrySelected}/>)
     }
 	return <div>Too many matches, specify a better filter</div>;
 };
