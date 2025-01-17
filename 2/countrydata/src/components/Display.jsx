@@ -13,7 +13,10 @@ const Display = ({ filter, onCountrySelected }) => {
 	useEffect(() => {
 		countryServices.getAll().then((countryList) => {
 			setCountries(countryList);			
-		});
+		}).catch((error) => {
+            console.log(error)
+            alert('error fetching country data')
+        });
 	}, []);
 
     if (filteredCountries.length === 1) {         
