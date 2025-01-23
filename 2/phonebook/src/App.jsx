@@ -5,7 +5,6 @@ import NewPersonForm from './components/NewPersonForm';
 import PersonList from './components/PersonList';
 import Filter from './components/Filter';
 
-
 const App = () => {
 	const [persons, setPersons] = useState([]);
 	const [newName, setNewName] = useState('');
@@ -41,7 +40,7 @@ const App = () => {
 			.create({ name: newName, number: newNumber })
 			.then((returnedPerson) => {
 				setPersons(persons.concat(returnedPerson));
-				handleNotification(`${returnedPerson.name} added!`)
+				handleNotification(`${returnedPerson.name} added!`);
 			})
 			.catch((error) => {
 				console.log('adding to server failed', error);
@@ -52,6 +51,7 @@ const App = () => {
 		setNewNumber('');
 	};
 
+	//TODO cannot update
 	const updatePerson = (person) => {
 		if (
 			!confirm(
@@ -68,7 +68,7 @@ const App = () => {
 						p.id === returnedPerson.id ? returnedPerson : p
 					)
 				);
-				handleNotification(`${returnedPerson.name} updated!`)
+				handleNotification(`${returnedPerson.name} updated!`);
 			})
 			.catch((error) => {
 				console.log(`Error updating ${person.name}'s info`, error);
@@ -76,6 +76,7 @@ const App = () => {
 			});
 	};
 
+	
 	const handleDeletePerson = (id) => {
 		const toDelete = persons.find((person) => person.id === id);
 		if (!confirm(`Delete ${toDelete.name}?`)) {
@@ -85,10 +86,9 @@ const App = () => {
 			.remove(id)
 			.then((returnedPerson) => {
 				setPersons(
-					persons.filter((person) => person.id !== returnedPerson.id)
-				);
-				console.log(`${returnedPerson.name} was deleted`);
-				handleNotification(`${returnedPerson.name} deleted!`)
+					persons.filter((person) => person.id !== toDelete.id)
+				);				
+				handleNotification(`${toDelete.name} deleted!`);
 			})
 			.catch((error) => {
 				console.log(`Could not delete ${id}`, error);
