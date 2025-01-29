@@ -4,6 +4,9 @@ import countryServices from '../services/countries';
 const CountryData = ({ country }) => {
 	const [weather, setWeather] = useState(null);
 	const capital = country.capital[0];
+    const imageStyles = {
+        width: '150px'
+    }
 
 	useEffect(() => {
 		countryServices
@@ -36,7 +39,7 @@ const CountryData = ({ country }) => {
 				</ul>
 			</div>
 			<div>
-				<img src={country.flags.svg} alt={country.flags.alt} />
+				<img src={country.flags.svg} alt={country.flags.alt} style={imageStyles} />
 			</div>
 			<div>
 				<h2>Weather in {country.capital[0]}</h2>
