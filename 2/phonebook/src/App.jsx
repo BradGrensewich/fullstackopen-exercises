@@ -15,7 +15,7 @@ const App = () => {
 	useEffect(() => {
 		personServices
 			.getAll()
-			.then((initialList) => {
+			.then((initialList) => {				
 				setPersons(
 					initialList.concat({
 						name: 'Fake person',
@@ -44,7 +44,7 @@ const App = () => {
 			})
 			.catch((error) => {
 				console.log('adding to server failed', error);
-				handleErrorMessage('Error adding to server');
+				handleErrorMessage(error.response.data.error);
 			});
 
 		setNewName('');
@@ -72,7 +72,7 @@ const App = () => {
 			})
 			.catch((error) => {
 				console.log(`Error updating ${person.name}'s info`, error);
-				handleErrorMessage(`Error updating ${person.name}'s info`);
+				handleErrorMessage(error.message);
 			});
 	};
 
