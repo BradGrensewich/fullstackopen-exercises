@@ -26,4 +26,23 @@ const favoriteBlog = (blogs) => {
     : null;
 };
 
-module.exports = { dummy, totalLikes, favoriteBlog };
+const mostBlogs = (blogs) => {
+  const authors = {};
+  blogs.forEach((blog) => {
+    const author = blog.author;
+    if (!Object.keys(authors).includes(author)) {
+      authors[author] = 0;
+    }
+    authors[author]++;
+  });
+
+  //creates array in the form [[author, blogcount], [..]..]
+  const authorList = Object.keys(authors).map((key) => [key, authors[key]]);
+  const prolific = authorList.reduce((pro, curr) => {
+    return pro && curr[1] < pro[1] ? pro : curr;
+  }, null);
+
+  return prolific ? { author: prolific[0], blogs: prolific[1] } : null;
+};
+
+module.exports = { dummy, totalLikes, favoriteBlog, mostBlogs };
