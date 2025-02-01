@@ -12,4 +12,18 @@ const totalLikes = (blogs) => {
   return total;
 };
 
-module.exports = { dummy, totalLikes };
+const favoriteBlog = (blogs) => {
+  const favorite = blogs.reduce((fav, curr) => {
+    return fav && curr.likes < fav.likes ? fav : curr;
+  }, null);
+
+  return favorite
+    ? {
+        title: favorite.title,
+        author: favorite.author,
+        likes: favorite.likes,
+      }
+    : null;
+};
+
+module.exports = { dummy, totalLikes, favoriteBlog };
