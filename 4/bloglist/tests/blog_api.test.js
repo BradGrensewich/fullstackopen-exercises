@@ -17,12 +17,21 @@ beforeEach(async () => {
 });
 
 test('API returns correct amount of blogs in JSON', async () => {
-  const blogs = await api
+  const res = await api
     .get('/api/blogs')
     .expect(200)
     .expect('Content-Type', /application\/json/);
 
-  assert.strictEqual(blogs.body.length, helper.initialBlogsList.length);
+  assert.strictEqual(res.body.length, helper.initialBlogsList.length);
+});
+
+test('blogs are identified by an "id" preperty not "_id"', async () => {
+  const res = await api.get('/api/blogs');
+  const blogs = res.body;
+  blogs.forEach((b) => {
+    assert(b.id);
+    assert(!b._id);
+  });
 });
 
 after(async () => {
