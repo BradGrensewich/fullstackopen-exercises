@@ -1,4 +1,4 @@
-const { test, after, beforeEach } = require('node:test');
+const { test, after, beforeEach, describe } = require('node:test');
 const app = require('../app');
 const supertest = require('supertest');
 const helper = require('./test_helper');
@@ -15,63 +15,85 @@ beforeEach(async () => {
     await blogObject.save();
   }
 });
+describe('when there is intially some blogs saved', () => {
+  test('API returns correct amount of blogs in JSON', async () => {
+    const res = await api
+      .get('/api/blogs')
+      .expect(200)
+      .expect('Content-Type', /application\/json/);
 
-test('API returns correct amount of blogs in JSON', async () => {
-  const res = await api
-    .get('/api/blogs')
-    .expect(200)
-    .expect('Content-Type', /application\/json/);
+    assert.strictEqual(res.body.length, helper.initialBlogsList.length);
+  });
 
-  assert.strictEqual(res.body.length, helper.initialBlogsList.length);
-});
-
-test('blogs are identified by an "id" preperty not "_id"', async () => {
-  const res = await api.get('/api/blogs');
-  const blogs = res.body;
-  blogs.forEach((b) => {
-    assert(b.id);
-    assert(!b._id);
+  test('blogs are identified by an "id" preperty not "_id"', async () => {
+    const res = await api.get('/api/blogs');
+    const blogs = res.body;
+    blogs.forEach((b) => {
+      assert(b.id);
+      assert(!b._id);
+    });
   });
 });
 
-test('can successfully add blog to db', async () => {
-  await api
-    .post('/api/blogs')
-    .send(helper.validBlog)
-    .expect(201)
-    .expect('Content-Type', /application\/json/);
+describe('addition of a new blog to db', () => {
+  test('is successfully when blog object is valid', async () => {
+    await api
+      .post('/api/blogs')
+      .send(helper.validBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/);
 
-  const blogsInDb = await helper.getCurrentDbState();
-  delete blogsInDb[blogsInDb.length - 1].id;
+    const blogsInDb = await helper.getCurrentDbState();
+    delete blogsInDb[blogsInDb.length - 1].id;
 
-  assert.strictEqual(blogsInDb.length, helper.initialBlogsList.length + 1);
-  assert.deepStrictEqual(blogsInDb[blogsInDb.length - 1], helper.validBlog);
+    assert.strictEqual(blogsInDb.length, helper.initialBlogsList.length + 1);
+    assert.deepStrictEqual(blogsInDb[blogsInDb.length - 1], helper.validBlog);
+  });
+
+  test('saves with zero likes when "likes" property is not defined', async () => {
+    const blogWithoutLikesProperty = helper.validBlog;
+    delete blogWithoutLikesProperty.likes;
+
+    await api
+      .post('/api/blogs')
+      .send(blogWithoutLikesProperty)
+      .expect(201)
+      .expect('Content-Type', /application\/json/);
+
+    const blogsInDb = await helper.getCurrentDbState();
+    assert.strictEqual(blogsInDb[blogsInDb.length - 1].likes, 0);
+  });
+
+  test('fails and responds with 400 when blog object has no "title" property', async () => {
+    const blogWithoutTitleProperty = helper.validBlog;
+    delete blogWithoutTitleProperty.title;
+    await api.post('/api/blogs').send(blogWithoutTitleProperty).expect(400);
+  });
+
+  test('fails and responds with 400 when blog object has no"url" property', async () => {
+    const blogWithoutUrlProperty = helper.validBlog;
+    delete blogWithoutUrlProperty.url;
+    await api.post('/api/blogs').send(blogWithoutUrlProperty).expect(400);
+  });
 });
 
-test('blog added to bd without "likes" property is added with "likes" value of 0', async () => {
-  const blogWithoutLikesProperty = helper.validBlog;
-  delete blogWithoutLikesProperty.likes;
+describe('deleting a note', () => {
+  test('succeeds with status code 204 when with valid id', async () => {
+    const blogsBefore = await helper.getCurrentDbState();
+    const blogToDelete = blogsBefore[0];
 
-  await api
-    .post('/api/blogs')
-    .send(blogWithoutLikesProperty)
-    .expect(201)
-    .expect('Content-Type', /application\/json/);
+    await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204);
+    const blogsAfter = await helper.getCurrentDbState();
+    const idsAfter = blogsAfter.map((b) => {
+      return b.id;
+    });
+    assert.strictEqual(blogsAfter.length, blogsBefore.length - 1);
+    assert(!idsAfter.includes(blogToDelete.id));
+  });
 
-  const blogsInDb = await helper.getCurrentDbState();
-  assert.strictEqual(blogsInDb[blogsInDb.length - 1].likes, 0);
-});
-
-test('api responds with 400 when POST request without "title" property', async () => {
-  const blogWithoutTitleProperty = helper.validBlog;
-  delete blogWithoutTitleProperty.title;
-  await api.post('/api/blogs').send(blogWithoutTitleProperty).expect(400);
-});
-
-test('api responds with 400 when POST request without "url" property', async () => {
-  const blogWithoutUrlProperty = helper.validBlog;
-  delete blogWithoutUrlProperty.url;
-  await api.post('/api/blogs').send(blogWithoutUrlProperty).expect(400);
+  test('fails with 404 when no id is provided', async () => {
+    await api.delete('/api/notes').expect(404);
+  });
 });
 
 after(async () => {

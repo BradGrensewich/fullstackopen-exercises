@@ -22,9 +22,12 @@ mongoose
 
 app.use(cors());
 app.use(express.json());
-app.use(requestLogger('tiny'));
+if (process.env.NODE_ENV !== 'test') {
+  app.use(requestLogger('tiny'));
+}
 
 app.use('/api/blogs', blogRouter);
+app.use(middleware.unknownEndpoint);
 
 app.use(middleware.errorHandler);
 
