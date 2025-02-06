@@ -38,6 +38,7 @@ const initialBlogsList = [
     likes: 2,
   },
 ];
+
 const validBlog = {
   title: 'Go To Statement Considered Harmful',
   author: 'Edsger W. Dijkstra',
@@ -45,9 +46,20 @@ const validBlog = {
   likes: 5,
 };
 
+const blogWithoutLikesProperty = {
+  title: 'Go To Statement Considered Harmful',
+  author: 'Edsger W. Dijkstra',
+  url: 'https://homepages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf',
+};
+
 const getCurrentDbState = async () => {
   const blogs = await Blog.find({});
   return blogs.map((b) => b.toJSON());
 };
 
-module.exports = { initialBlogsList, validBlog, getCurrentDbState };
+module.exports = {
+  initialBlogsList,
+  validBlog,
+  getCurrentDbState,
+  blogWithoutLikesProperty,
+};

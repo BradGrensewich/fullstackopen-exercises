@@ -48,6 +48,17 @@ test('can successfully add blog to db', async () => {
   assert.deepStrictEqual(blogsInDb[blogsInDb.length - 1], helper.validBlog);
 });
 
+test('blog added to bd without "likes" property is added with "likes" value of 0', async () => {
+  await api
+    .post('/api/blogs')
+    .send(helper.blogWithoutLikesProperty)
+    .expect(201)
+    .expect('Content-Type', /application\/json/);
+
+  const blogsInDb = await helper.getCurrentDbState();
+  assert.strictEqual(blogsInDb[blogsInDb.length - 1].likes, 0);
+});
+
 after(async () => {
   await mongoose.connection.close();
 });
