@@ -49,14 +49,29 @@ test('can successfully add blog to db', async () => {
 });
 
 test('blog added to bd without "likes" property is added with "likes" value of 0', async () => {
+  const blogWithoutLikesProperty = helper.validBlog;
+  delete blogWithoutLikesProperty.likes;
+
   await api
     .post('/api/blogs')
-    .send(helper.blogWithoutLikesProperty)
+    .send(blogWithoutLikesProperty)
     .expect(201)
     .expect('Content-Type', /application\/json/);
 
   const blogsInDb = await helper.getCurrentDbState();
   assert.strictEqual(blogsInDb[blogsInDb.length - 1].likes, 0);
+});
+
+test('api responds with 400 when POST request without "title" property', async () => {
+  const blogWithoutTitleProperty = helper.validBlog;
+  delete blogWithoutTitleProperty.title;
+  await api.post('/api/blogs').send(blogWithoutTitleProperty).expect(400);
+});
+
+test('api responds with 400 when POST request without "url" property', async () => {
+  const blogWithoutUrlProperty = helper.validBlog;
+  delete blogWithoutUrlProperty.url;
+  await api.post('/api/blogs').send(blogWithoutUrlProperty).expect(400);
 });
 
 after(async () => {
