@@ -34,6 +34,20 @@ test('blogs are identified by an "id" preperty not "_id"', async () => {
   });
 });
 
+test('can successfully add blog to db', async () => {
+  await api
+    .post('/api/blogs')
+    .send(helper.validBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/);
+
+  const blogsInDb = await helper.getCurrentDbState();
+  delete blogsInDb[blogsInDb.length - 1].id;
+
+  assert.strictEqual(blogsInDb.length, helper.initialBlogsList.length + 1);
+  assert.deepStrictEqual(blogsInDb[blogsInDb.length - 1], helper.validBlog);
+});
+
 after(async () => {
   await mongoose.connection.close();
 });
