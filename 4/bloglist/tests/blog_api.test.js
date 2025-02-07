@@ -77,8 +77,8 @@ describe('addition of a new blog to db', () => {
   });
 });
 
-describe('deleting a note', () => {
-  test('succeeds with status code 204 when with valid id', async () => {
+describe('deleting a blog', () => {
+  test('succeeds with status code 204', async () => {
     const blogsBefore = await helper.getCurrentDbState();
     const blogToDelete = blogsBefore[0];
 
@@ -93,6 +93,31 @@ describe('deleting a note', () => {
 
   test('fails with 404 when no id is provided', async () => {
     await api.delete('/api/notes').expect(404);
+  });
+});
+
+describe('updating a blog', () => {
+  test('succeeds and returns updated note as JSON', async () => {
+    const blogsBefore = await helper.getCurrentDbState();
+    const blogToUpdate = { ...blogsBefore[0], likes: 999, author: 'updated' };
+    const response = await api
+      .put(`/api/blogs/${blogToUpdate.id}`)
+      .send(blogToUpdate)
+      .expect(200)
+      .expect('Content-Type', /application\/json/);
+    assert.deepStrictEqual(response.body, blogToUpdate);
+
+    const blogsAfter = await helper.getCurrentDbState();
+    const updatedBlog = blogsAfter.find((b) => b.id === blogToUpdate.id);
+    assert(updatedBlog);
+    assert.deepStrictEqual(updatedBlog, blogToUpdate);
+  });
+  test('fails with 404 on updating with invalid id', async () => {
+    const id = await helper.getInvalidId();
+    await api
+      .put(`/api/blogs/${id}`)
+      .send({ title: 'test', author: 'test', url: 'test', likes: 0 })
+      .expect(404);
   });
 });
 

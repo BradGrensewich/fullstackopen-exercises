@@ -50,5 +50,22 @@ const getCurrentDbState = async () => {
   const blogs = await Blog.find({});
   return blogs.map((b) => b.toJSON());
 };
+const getInvalidId = async () => {
+  const toDelete = new Blog({
+    title: 'To delete',
+    author: 'Delete',
+    url: 'https://delete.pdf',
+    likes: 0,
+  });
+  const inDB = await toDelete.save();
+  const id = inDB.id;
+  await Blog.findByIdAndDelete(id);
+  return id;
+};
 
-module.exports = { initialBlogsList, validBlog, getCurrentDbState };
+module.exports = {
+  initialBlogsList,
+  validBlog,
+  getCurrentDbState,
+  getInvalidId,
+};
