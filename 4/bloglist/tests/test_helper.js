@@ -1,4 +1,5 @@
 const Blog = require('../models/blog');
+const User = require('../models/user');
 
 const initialBlogsList = [
   {
@@ -46,9 +47,14 @@ const validBlog = {
   likes: 5,
 };
 
-const getCurrentDbState = async () => {
+const getCurrentBlogs = async () => {
   const blogs = await Blog.find({});
   return blogs.map((b) => b.toJSON());
+};
+
+const getCurrentUsers = async () => {
+  const users = await User.find({});
+  return users.map((u) => u.toJSON());
 };
 const getInvalidId = async () => {
   const toDelete = new Blog({
@@ -66,6 +72,7 @@ const getInvalidId = async () => {
 module.exports = {
   initialBlogsList,
   validBlog,
-  getCurrentDbState,
+  getCurrentBlogs,
+  getCurrentUsers,
   getInvalidId,
 };
