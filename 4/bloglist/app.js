@@ -27,6 +27,7 @@ app.use(express.json());
 if (process.env.NODE_ENV !== 'test') {
   app.use(requestLogger('tiny'));
 }
+app.use(middleware.tokenExtractor);
 
 app.use('/api/blogs', blogRouter);
 app.use('/api/users', userRouter);
