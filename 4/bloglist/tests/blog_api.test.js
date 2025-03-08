@@ -6,11 +6,13 @@ const mongoose = require('mongoose');
 const Blog = require('../models/blog');
 const User = require('../models/user');
 const assert = require('node:assert');
+const jwt = require('jsonwebtoken');
 
 const api = supertest(app);
 
 describe('when there are intially some blogs saved', () => {
   beforeEach(async () => {
+    await User.deleteMany({});
     await Blog.deleteMany({});
     for (let b of helper.initialBlogsList) {
       const blogObject = new Blog(b);
@@ -35,27 +37,32 @@ describe('when there are intially some blogs saved', () => {
     });
   });
   describe('addition of a new blog to db', () => {
-    test('is successfully when blog object is valid', async () => {
+    test('is successfully when blog object is valid and token is provided', async () => {
+      const token = await helper.getValidToken();
       await api
         .post('/api/blogs')
         .send(helper.validBlog)
+        .set('Authorization', `Bearer ${token}`)
         .expect(201)
         .expect('Content-Type', /application\/json/);
 
       const blogsInDb = await helper.getCurrentBlogs();
       delete blogsInDb[blogsInDb.length - 1].id;
-
       assert.strictEqual(blogsInDb.length, helper.initialBlogsList.length + 1);
+      const newBlog = blogsInDb[blogsInDb.length - 1];
+      delete newBlog.user;
       assert.deepStrictEqual(blogsInDb[blogsInDb.length - 1], helper.validBlog);
     });
 
     test('saves with zero likes when "likes" property is not defined', async () => {
       const blogWithoutLikesProperty = helper.validBlog;
       delete blogWithoutLikesProperty.likes;
+      const token = await helper.getValidToken();
 
       await api
         .post('/api/blogs')
         .send(blogWithoutLikesProperty)
+        .set('Authorization', `Bearer ${token}`)
         .expect(201)
         .expect('Content-Type', /application\/json/);
 
@@ -66,22 +73,50 @@ describe('when there are intially some blogs saved', () => {
     test('fails and responds with 400 when blog object has no "title" property', async () => {
       const blogWithoutTitleProperty = helper.validBlog;
       delete blogWithoutTitleProperty.title;
-      await api.post('/api/blogs').send(blogWithoutTitleProperty).expect(400);
+      const token = await helper.getValidToken();
+      await api
+        .post('/api/blogs')
+        .send(blogWithoutTitleProperty)
+        .set('Authorization', `Bearer ${token}`)
+        .expect(400);
     });
 
     test('fails and responds with 400 when blog object has no "url" property', async () => {
       const blogWithoutUrlProperty = helper.validBlog;
       delete blogWithoutUrlProperty.url;
-      await api.post('/api/blogs').send(blogWithoutUrlProperty).expect(400);
+      const token = await helper.getValidToken();
+      await api
+        .post('/api/blogs')
+        .send(blogWithoutUrlProperty)
+        .set('Authorization', `Bearer ${token}`)
+        .expect(400);
+    });
+
+    test('fails and responds with 401 when token is not provided', async () => {
+      await api.post('/api/blogs').send(helper.validBlog).expect(401);
     });
   });
 
   describe('deleting a blog', () => {
     test('succeeds with status code 204', async () => {
+      const token = await helper.getValidToken();
+      const decoded = jwt.verify(token, process.env.SECRET);
+      const blog = {
+        title: 'Go To Statement Considered Harmful',
+        author: 'Edsger W. Dijkstra',
+        url: 'https://homepages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf',
+        likes: 5,
+      };
+      blog.user = decoded.id;
+      const blogToDelete = new Blog(blog);
+      const savedBlog = await blogToDelete.save();
       const blogsBefore = await helper.getCurrentBlogs();
-      const blogToDelete = blogsBefore[0];
 
-      await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204);
+      await api
+        .delete(`/api/blogs/${savedBlog.id}`)
+        .set('Authorization', `Bearer ${token}`)
+        .expect(204);
+
       const blogsAfter = await helper.getCurrentBlogs();
       const idsAfter = blogsAfter.map((b) => {
         return b.id;
@@ -121,7 +156,7 @@ describe('when there are intially some blogs saved', () => {
   });
 });
 
-describe.only('adding a user', async () => {
+describe('adding a user', async () => {
   beforeEach(async () => {
     await User.deleteMany({});
   });
@@ -139,7 +174,7 @@ describe.only('adding a user', async () => {
     assert(userNames.includes(user.username));
   });
 
-  test.only('fails when username is too short', async () => {
+  test('fails when username is too short', async () => {
     const user = { username: 'a', name: 'Brad G', password: 'secret' };
     const result = await api
       .post('/api/users')
@@ -154,7 +189,7 @@ describe.only('adding a user', async () => {
     assert.strictEqual(users.length, 0);
   });
 
-  test.only('fails when password is too short', async () => {
+  test('fails when password is too short', async () => {
     const user = { username: 'Test user', name: 'Brad G', password: 's' };
     const result = await api
       .post('/api/users')
@@ -169,7 +204,7 @@ describe.only('adding a user', async () => {
     assert.strictEqual(users.length, 0);
   });
 
-  test.only('fails when username is already taken', async () => {
+  test('fails when username is already taken', async () => {
     const username = 'Can only be used once';
     const initial = new User({
       username,

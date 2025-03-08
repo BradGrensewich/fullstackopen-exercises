@@ -12,6 +12,9 @@ blogRouter.get('/', async (req, res) => {
 
 blogRouter.post('/', async (req, res) => {
   const user = req.user;
+  if (!user) {
+    return res.status(401).json({ error: 'token invalid' });
+  }
   const blog = new Blog({ ...req.body, user: user.id });
   const savedBlog = await blog.save();
   user.blogs = user.blogs.concat(savedBlog.id);
@@ -23,6 +26,9 @@ blogRouter.delete('/:id', async (req, res) => {
   const id = req.params.id;
   const blog = await Blog.findById(id);
   const user = req.user;
+  if (!user) {
+    return res.status(401).json({ error: 'token invalid' });
+  }
   if (user.id.toString() === blog.user.toString()) {
     await Blog.findByIdAndDelete(blog.id);
     user.blogs = user.blogs.filter((b) => b.id !== id);

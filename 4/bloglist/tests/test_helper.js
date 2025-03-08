@@ -1,5 +1,6 @@
 const Blog = require('../models/blog');
 const User = require('../models/user');
+const jwt = require('jsonwebtoken');
 
 const initialBlogsList = [
   {
@@ -69,10 +70,27 @@ const getInvalidId = async () => {
   return id;
 };
 
+const getValidToken = async () => {
+  const user = new User({
+    username: 'Blog owner',
+    name: 'not real',
+    passwordHash: 'sjanfsdjnfui',
+    blogs: [],
+  });
+  const savedUser = await user.save();
+  const testToken = jwt.sign(
+    { username: savedUser.username, id: savedUser.id },
+    process.env.SECRET,
+    { expiresIn: '1m' },
+  );
+  return testToken;
+};
+
 module.exports = {
   initialBlogsList,
   validBlog,
   getCurrentBlogs,
   getCurrentUsers,
   getInvalidId,
+  getValidToken,
 };
