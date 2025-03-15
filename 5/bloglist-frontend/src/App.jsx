@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Blog from './components/Blog';
 import LoginForm from './components/LoginForm';
 import LoginInfo from './components/LoginInfo';
+import BlogForm from './components/BlogForm';
 import blogService from './services/blogs';
 import loginService from './services/login';
 
@@ -21,19 +22,25 @@ const App = () => {
     fetchBlogs();
   }, []);
 
+  //LOGIN stuff
+  const loginUser = (userData) => {
+    setUser(userData);
+    blogService.setToken(userData.token);
+    window.localStorage.setItem('user', JSON.stringify(userData));
+  };
+
   useEffect(() => {
-    const userJSON = window.localStorage.getItem('user');
+    const userJSON = window.localStorage.getItem('user');   
     if (userJSON) {
-      const user = JSON.parse(userJSON);
-      setUser(user);
+      const userData = JSON.parse(userJSON);      
+      loginUser(userData);
     }
   }, []);
 
   const handleLogin = async (username, password) => {
     try {
       const userData = await loginService.login(username, password);
-      setUser(userData);
-      window.localStorage.setItem('user', JSON.stringify(user));
+      loginUser(userData);
       return true;
     } catch (error) {
       //error message display
@@ -46,6 +53,16 @@ const App = () => {
     window.localStorage.clear();
     setUser(null);
   };
+  const handleCreateBlog = async (title, author, url) => {
+    try {
+      const savedBlog = await blogService.create(title, author, url);
+      setBlogs(blogs.concat(savedBlog))
+      return true;
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <div>
       {user === null && <LoginForm onLogin={handleLogin} />}
@@ -53,6 +70,9 @@ const App = () => {
         <div>
           <h2>blogs</h2>
           <LoginInfo user={user} onLogout={handleLogout} />
+
+          <BlogForm onCreate={handleCreateBlog} />
+
           {blogs.map((blog) => (
             <Blog key={blog.id} blog={blog} />
           ))}
