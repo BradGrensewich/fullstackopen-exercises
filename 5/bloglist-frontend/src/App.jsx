@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import Togglable from './components/Togglable';
 import Blog from './components/Blog';
 import LoginForm from './components/LoginForm';
 import LoginInfo from './components/LoginInfo';
@@ -44,10 +45,10 @@ const App = () => {
     try {
       const userData = await loginService.login(username, password);
       loginUser(userData);
-      handleMessage('Login successful')
+      handleMessage('Login successful');
       return true;
     } catch (error) {
-      handleErrorMessage(error.message)
+      handleErrorMessage(error.message);
       return false;
     }
   };
@@ -55,7 +56,7 @@ const App = () => {
   const handleLogout = () => {
     window.localStorage.clear();
     setUser(null);
-    handleMessage('successfully logged out')
+    handleMessage('successfully logged out');
   };
 
   //blog stuff
@@ -63,11 +64,11 @@ const App = () => {
     try {
       const savedBlog = await blogService.create(title, author, url);
       setBlogs(blogs.concat(savedBlog));
-      handleMessage('successfully added blog')
+      handleMessage('successfully added blog');
       return true;
     } catch (error) {
       console.error(error);
-      handleErrorMessage(error.message)
+      handleErrorMessage(error.message);
     }
   };
 
@@ -76,31 +77,38 @@ const App = () => {
     setMessage(text);
     setTimeout(() => {
       setMessage(null);
-      setMessageIsError(false)
+      setMessageIsError(false);
     }, 5000);
   };
 
   const handleErrorMessage = (text) => {
-    setMessageIsError(true)
-    handleMessage(text)    
+    setMessageIsError(true);
+    handleMessage(text);
+  };
+
+  const blogPage = () => {
+    return (
+      <div>
+        <h2>blogs</h2>
+        <LoginInfo user={user} onLogout={handleLogout} />
+        <Togglable label='create new blog'>
+          <BlogForm onCreate={handleCreateBlog} />
+        </Togglable>
+
+        {blogs.map((blog) => (
+          <Blog key={blog.id} blog={blog} />
+        ))}
+      </div>
+    );
   };
 
   return (
     <div>
-      {message !== null && <MessageDisplay text={message} isError={messageIsError}/>}
-      {user === null && <LoginForm onLogin={handleLogin} />}
-      {user !== null && (
-        <div>
-          <h2>blogs</h2>
-          <LoginInfo user={user} onLogout={handleLogout} />
-
-          <BlogForm onCreate={handleCreateBlog} />
-
-          {blogs.map((blog) => (
-            <Blog key={blog.id} blog={blog} />
-          ))}
-        </div>
+      {message !== null && (
+        <MessageDisplay text={message} isError={messageIsError} />
       )}
+      {user === null && <LoginForm onLogin={handleLogin} />}
+      {user !== null && blogPage()}
     </div>
   );
 };
