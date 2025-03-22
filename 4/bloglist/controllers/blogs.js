@@ -47,12 +47,17 @@ blogRouter.put('/:id', async (req, res) => {
     author: body.author,
     url: body.url,
     likes: body.likes,
+    user: body.user,
   };
 
   const updated = await Blog.findByIdAndUpdate(id, blog, {
     new: true,
     runValidators: true,
     context: 'query',
+  }).populate('user', {
+    username: 1,
+    name: 1,
+    id: 1,
   });
   if (updated === null) {
     return res.status(404).json({ error: 'blog not found' });
