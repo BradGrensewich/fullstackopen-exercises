@@ -14,18 +14,6 @@ const App = () => {
   const [message, setMessage] = useState(null);
   const [messageIsError, setMessageIsError] = useState(false);
 
-  useEffect(() => {
-    const fetchBlogs = async () => {
-      try {
-        const blogs = await blogService.getAll();
-        setBlogs(blogs);
-      } catch (error) {
-        console.error('Error fetching blogs:', error);
-      }
-    };
-    fetchBlogs();
-  }, []);
-
   //LOGIN stuff
   const loginUser = (userData) => {
     setUser(userData);
@@ -60,6 +48,18 @@ const App = () => {
   };
 
   //blog stuff
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      try {
+        const blogs = await blogService.getAll();
+        setBlogs(blogs);
+      } catch (error) {
+        console.error('Error fetching blogs:', error);
+      }
+    };
+    fetchBlogs();
+  }, []);
+
   const handleCreateBlog = async (title, author, url) => {
     try {
       const savedBlog = await blogService.create(title, author, url);
@@ -68,6 +68,23 @@ const App = () => {
       return true;
     } catch (error) {
       console.error(error);
+      handleErrorMessage(error.message);
+    }
+  };
+  const handleIncrementBlogLikes = async (blog) => {
+    console.log(blog)
+    const changedBlog = { ...blog, user: blog.user.id, likes: blog.likes + 1};    
+    try {
+      const updatedBlog = await blogService.update(changedBlog);
+      console.log('Updated Blog:', updatedBlog);
+
+      setBlogs(
+        blogs.map((b) => {
+          return b.id === updatedBlog.id ? updatedBlog : b;
+        }),
+      );
+      console.log('Updated blogs state:', blogs);
+    } catch (error) {
       handleErrorMessage(error.message);
     }
   };
@@ -96,7 +113,11 @@ const App = () => {
         </Togglable>
 
         {blogs.map((blog) => (
-          <Blog key={blog.id} blog={blog} />
+          <Blog
+            key={blog.id}
+            blog={blog}
+            onIncrementLike={() => handleIncrementBlogLikes(blog)}
+          />
         ))}
       </div>
     );
