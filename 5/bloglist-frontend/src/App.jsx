@@ -60,6 +60,10 @@ const App = () => {
     fetchBlogs();
   }, []);
 
+  const sortedBlogs = blogs.sort((a, b) => {
+    return a.likes - b.likes;
+  });
+
   const handleCreateBlog = async (title, author, url) => {
     try {
       const savedBlog = await blogService.create(title, author, url);
@@ -71,19 +75,16 @@ const App = () => {
       handleErrorMessage(error.message);
     }
   };
+
   const handleIncrementBlogLikes = async (blog) => {
-    console.log(blog)
-    const changedBlog = { ...blog, user: blog.user.id, likes: blog.likes + 1};    
+    const changedBlog = { ...blog, user: blog.user.id, likes: blog.likes + 1 };
     try {
       const updatedBlog = await blogService.update(changedBlog);
-      console.log('Updated Blog:', updatedBlog);
-
       setBlogs(
         blogs.map((b) => {
           return b.id === updatedBlog.id ? updatedBlog : b;
         }),
       );
-      console.log('Updated blogs state:', blogs);
     } catch (error) {
       handleErrorMessage(error.message);
     }
@@ -112,7 +113,7 @@ const App = () => {
           <BlogForm onCreate={handleCreateBlog} />
         </Togglable>
 
-        {blogs.map((blog) => (
+        {sortedBlogs.map((blog) => (
           <Blog
             key={blog.id}
             blog={blog}
