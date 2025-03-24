@@ -13,45 +13,33 @@ const getAll = () => {
 };
 
 const create = async (title, author, url) => {
-  try {
-    if (!title || !author || !url) {
-      throw error({ message: 'must fill out all inputs' });
-    }
-    const config = {
-      headers: { Authorization: token },
-    };
-    const blog = { title, author, url };
-    const response = await axios.post(baseUrl, blog, config);
-    return response.data;
-  } catch (error) {
-    throw error;
+  if (!title || !author || !url) {
+    throw new Error({ message: 'must fill out all inputs' });
   }
+  const config = {
+    headers: { Authorization: token },
+  };
+  const blog = { title, author, url };
+  const response = await axios.post(baseUrl, blog, config);
+  return response.data;
 };
 
 const update = async (updatedBlog) => {
-  try {
-    const config = {
-      headers: { Authorization: token },
-    };
-    const id = updatedBlog.id;
-    const response = await axios.put(`${baseUrl}/${id}`, updatedBlog, config);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const config = {
+    headers: { Authorization: token },
+  };
+  const id = updatedBlog.id;
+  const response = await axios.put(`${baseUrl}/${id}`, updatedBlog, config);
+  return response.data;
 };
 
 const remove = async (blog) => {
-  try {
-    const config = {
-      headers: {Authorization: token}
-    }
-    const id = blog.id
-    const response = await axios.delete(`${baseUrl}/${id}`, config)
-    return response.data  
-  } catch (error) {
-    throw error
-  }  
-}
+  const config = {
+    headers: { Authorization: token },
+  };
+  const id = blog.id;
+  const response = await axios.delete(`${baseUrl}/${id}`, config);
+  return response.data;
+};
 
 export default { getAll, create, update, remove, setToken };
