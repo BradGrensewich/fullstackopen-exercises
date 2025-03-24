@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import blogService from '../services/blogs';
 
-const Blog = ({ blog, onIncrementLike }) => {
+const Blog = ({ blog, onIncrementLike, isOwner, onDeletePost }) => {
   const [visible, setVisible] = useState(false);
+  console.log('Blog', blog)
   const toggleVisiblity = () => {
     setVisible(!visible);
   };
@@ -23,10 +23,10 @@ const Blog = ({ blog, onIncrementLike }) => {
         <ul>
           <li>{blog.url}</li>
           <li>
-            likes: {blog.likes}{' '}
-            <button onClick={onIncrementLike}>like</button>
+            likes: {blog.likes} <button onClick={onIncrementLike}>like</button>
           </li>
           <li>added by: {blog.user.name} </li>
+          {isOwner && <button onClick={onDeletePost}>remove</button>}
         </ul>
 
         <button onClick={toggleVisiblity}>hide</button>

@@ -20,6 +20,7 @@ const App = () => {
     blogService.setToken(userData.token);
     window.localStorage.setItem('user', JSON.stringify(userData));
   };
+  console.log('User: ', user)
 
   useEffect(() => {
     const userJSON = window.localStorage.getItem('user');
@@ -90,6 +91,15 @@ const App = () => {
     }
   };
 
+  const handleDeletePost = async (blog) => {
+    try {
+      await blogService.remove(blog);
+      setBlogs(blogs.filter((b) => b.id !== blog.id));
+    } catch (error) {
+      handleErrorMessage(error.message);
+    }
+  };
+
   //message stuff
   const handleMessage = (text) => {
     setMessage(text);
@@ -118,6 +128,8 @@ const App = () => {
             key={blog.id}
             blog={blog}
             onIncrementLike={() => handleIncrementBlogLikes(blog)}
+            isOwner={blog.user.username === user.username}
+            onDeletePost={() => handleDeletePost(blog)}
           />
         ))}
       </div>
