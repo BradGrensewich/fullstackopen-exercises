@@ -2,7 +2,6 @@ import { useState } from 'react';
 
 const Blog = ({ blog, onIncrementLike, isOwner, onDeletePost }) => {
   const [visible, setVisible] = useState(false);
-  console.log('Blog', blog)
   const toggleVisiblity = () => {
     setVisible(!visible);
   };
@@ -18,12 +17,17 @@ const Blog = ({ blog, onIncrementLike, isOwner, onDeletePost }) => {
 
   return (
     <div style={blogStyle}>
-      {blog.title} {blog.author}
-      <div style={showWhenVisible}>
+      <p>{blog.title}</p>
+      <p>{blog.author}</p>
+
+      <div style={showWhenVisible} className='info'>
         <ul>
-          <li>{blog.url}</li>
           <li>
-            likes: {blog.likes} <button onClick={onIncrementLike}>like</button>
+            <p>{blog.url}</p>
+          </li>
+          <li>
+            <p>likes: {blog.likes}</p>
+            <button onClick={onIncrementLike}>like</button>
           </li>
           <li>added by: {blog.user.name} </li>
           {isOwner && <button onClick={onDeletePost}>remove</button>}
