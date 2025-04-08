@@ -19,8 +19,7 @@ const App = () => {
     setUser(userData);
     blogService.setToken(userData.token);
     window.localStorage.setItem('user', JSON.stringify(userData));
-  };
-  console.log('User: ', user)
+  };  
 
   useEffect(() => {
     const userJSON = window.localStorage.getItem('user');
@@ -95,6 +94,7 @@ const App = () => {
     try {
       await blogService.remove(blog);
       setBlogs(blogs.filter((b) => b.id !== blog.id));
+      setMessage('blog deleted')
     } catch (error) {
       handleErrorMessage(error.message);
     }

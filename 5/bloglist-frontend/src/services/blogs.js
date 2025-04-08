@@ -21,6 +21,7 @@ const create = async (title, author, url) => {
   };
   const blog = { title, author, url };
   const response = await axios.post(baseUrl, blog, config);
+  console.log(response.data)
   return response.data;
 };
 

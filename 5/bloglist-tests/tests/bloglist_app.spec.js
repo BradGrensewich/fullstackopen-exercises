@@ -48,10 +48,19 @@ describe('Blog app', () => {
             await createBlog(page, 'test title', 'test author', 'test url')
         })
 
-        test.only('a blog can be liked', async ({page}) => {
+        test('it can be liked', async ({page}) => {
             await page.getByRole('button', {name: 'show'}).click()
             await page.getByRole('button', {name: 'like'}).click()
             await expect(page.getByText('likes: 1')).toBeVisible()
+        })
+
+        test.only('it can be deleted by its owner', async ({page}) => {
+            await page.getByRole('button', {name: 'show'}).click()
+            await page.getByRole('button', {name: 'remove'}).click()
+            
+            await expect(page.getByText('blog deleted')).toBeVisible()
+            await expect(page.getByText('test title')).not.toBeVisible();     
+
         })
     })
   });
