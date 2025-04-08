@@ -21,14 +21,31 @@ describe('Blog app', () => {
 
   describe('Login', () => {
     test('succeeds with correct credentials', async ({ page }) => {
-      login(page, 'username', 'password');
+      await login(page, 'username', 'password');
       await expect(page.getByText('Brad logged in')).toBeVisible();
     });
 
-    test.only('fails with wrong password', async ({ page }) => {
-      login(page, 'username', 'wrong');
+    test('fails with wrong password', async ({ page }) => {
+      await login(page, 'username', 'wrong');
       await expect(page.getByText('Brad logged in')).not.toBeVisible();
       await expect(page.getByText('Login failed')).toBeVisible();
+    });
+  });
+
+  describe('When logged in', () => {
+    beforeEach(async ({ page }) => {
+      await login(page, 'username', 'password');
+    });
+
+    test.only('a new blog can be created', async ({ page }) => {
+      await page.getByRole('button', { name: 'create new blog' }).click();
+      await page.getByPlaceholder('title').fill('new blog');
+      await page.getByPlaceholder('author').fill('brad');
+      await page.getByPlaceholder('url').fill('www.fake.com');
+      await page.getByRole('button', { name: 'create' }).click();
+
+      const blog = await page.getByTestId('blog')
+      await expect(blog.getByText('new blog')).toBeVisible();
     });
   });
 });

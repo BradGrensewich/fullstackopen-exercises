@@ -26,7 +26,8 @@ const BlogForm = ({onCreate}) => {
           name='title'
           onChange={({ target }) => {
             setTitle(target.value);
-          }}></input>
+          }}
+          data-testid='title'></input>
       </div>
       <div>
         author
