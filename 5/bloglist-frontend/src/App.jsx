@@ -37,7 +37,7 @@ const App = () => {
       handleMessage('Login successful');
       return true;
     } catch (error) {
-      handleErrorMessage(error.message);
+      handleErrorMessage('Login failed');
       return false;
     }
   };
