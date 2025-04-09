@@ -4,7 +4,6 @@ const { request } = require('http');
 
 describe('Blog app', () => {
   beforeEach(async ({ page, request }) => {
-    await page.goto('http://localhost:5173');
     await request.post('http://localhost:3001/api/testing/reset');
     await request.post('http://localhost:3001/api/users', {
       data: {
@@ -13,6 +12,8 @@ describe('Blog app', () => {
         name: 'Brad',
       },
     });
+
+    await page.goto('http://localhost:5173');
   });
 
   test('Login form is shown', async ({ page }) => {
@@ -63,10 +64,7 @@ describe('Blog app', () => {
         await expect(page.getByText('test title')).not.toBeVisible();
       });
 
-      test.only('it cant be deleted by a second user', async ({
-        page,
-        request,
-      }) => {
+      test('it cant be deleted by a second user', async ({ page, request }) => {
         await request.post('http://localhost:3001/api/users', {
           data: {
             username: 'user2',
@@ -82,6 +80,48 @@ describe('Blog app', () => {
         await expect(
           page.getByRole('button', { name: 'delete' }),
         ).not.toBeVisible();
+      });
+    });
+    describe('and there are 3 blogs created', () => {
+      beforeEach(async ({ page }) => {
+        await createBlog(page, 'only one', 'sdvmko', 'dsnov');
+        await page.getByRole('button', { name: 'cancel' }).click();
+        await createBlog(page, 'most', 'sdvmsfsd', 'dscvsdsnov');
+        await page.getByRole('button', { name: 'cancel' }).click();
+        await createBlog(page, 'none', 'ssdvdvmko', 'ddfvdfsnov');
+        await page.getByRole('button', { name: 'cancel' }).click();
+      });
+
+      test.only('blogs are sorted in order of likes', async ({ page }) => {
+        //add a like to one
+        const oneDiv = await page.getByText('only one').locator('..');
+        await oneDiv.getByRole('button', { name: 'show' }).click();
+        await oneDiv.getByRole('button', { name: 'like' }).click();
+        await page.getByText('likes: 1').waitFor();
+
+        //add 2 likes to most
+        let mostDiv = await page.getByText('most').locator('..');
+        await mostDiv.getByRole('button', { name: 'show' }).click();
+        await mostDiv.getByRole('button', { name: 'like' }).click();
+        await page
+          .getByText('most')
+          .locator('..')
+          .getByText('likes: 1')
+          .waitFor();
+        mostDiv = await page.getByText('most').locator('..');
+        await mostDiv.getByRole('button', { name: 'like' }).click();
+        await page
+          .getByText('most')
+          .locator('..')
+          .getByText('likes: 2')
+          .waitFor();
+
+        //check order
+        const blogTitles = await page.getByTestId('blogtitle').all();
+        await expect(blogTitles).toHaveLength(3);
+        await expect(blogTitles[0]).toContainText('none')
+        await expect(blogTitles[1]).toContainText('only one')
+        await expect(blogTitles[2]).toContainText('most')
       });
     });
   });

@@ -17,7 +17,7 @@ const Blog = ({ blog, onIncrementLike, isOwner, onDeletePost }) => {
 
   return (
     <div style={blogStyle} data-testid='blog'>
-      <p>{blog.title}</p>
+      <p data-testid='blogtitle'>{blog.title}</p>
       <p>{blog.author}</p>
 
       <div style={showWhenVisible} className='info'>

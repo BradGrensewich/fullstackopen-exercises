@@ -5,7 +5,7 @@ const MessageDisplay = ({ text, isError }) => {
     : (messageStyle.border = '2px solid green');
   return (
     <div>
-      <h3 style={messageStyle}>{text}</h3>
+      <h3 style={messageStyle} data-testid="notification">{text}</h3>
     </div>
   );
 };
