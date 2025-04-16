@@ -92,7 +92,7 @@ describe('Blog app', () => {
         await page.getByRole('button', { name: 'cancel' }).click();
       });
 
-      test.only('blogs are sorted in order of likes', async ({ page }) => {
+      test('blogs are sorted in order of likes', async ({ page }) => {
         //add a like to one
         const oneDiv = await page.getByText('only one').locator('..');
         await oneDiv.getByRole('button', { name: 'show' }).click();
