@@ -33,7 +33,7 @@
     {
       "id": "4eba",
       "content": "test",
-      "votes": 0
+      "votes": 2
     },
     {
       "id": "c30e",
@@ -48,6 +48,16 @@
     {
       "id": "4266",
       "content": "testing thunk",
+      "votes": 0
+    },
+    {
+      "id": "673b",
+      "content": "test notification",
+      "votes": 0
+    },
+    {
+      "id": "0e2a",
+      "content": "testing dispatch in seperate action reducer",
       "votes": 0
     }
   ]
